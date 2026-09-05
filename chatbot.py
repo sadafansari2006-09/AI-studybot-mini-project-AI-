@@ -1,4 +1,4 @@
-from test_data import subjects
+from data import subjects
 
 
 def show_menu():
