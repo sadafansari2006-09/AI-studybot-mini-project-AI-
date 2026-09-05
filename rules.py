@@ -1,168 +1,619 @@
-from knowledge_base import theory_syllabus, practical_syllabus, exams
+# ========================================
+# STUDYBOT - RULES / REASONING
+# Person 3: Rule-Based Chatbot Logic
+# ========================================
 
+from data import subjects
+
+
+# ========================================
+# GET AI DATA
+# ========================================
+
+ai_data = subjects["AI"]
+
+
+# ========================================
 # 1. GET THEORY SYLLABUS
+# ========================================
+
 def get_theory_syllabus():
-    """Returns the complete AI theory syllabus."""
+    """Return the complete AI theory syllabus."""
+
+    syllabus = ai_data["syllabus"]
 
     response = "\n===== AI THEORY SYLLABUS =====\n"
 
-    for module_no, module in theory_syllabus.items():
-        response += f"\nModule {module_no}: {module['title']}\n"
+    for module_name, module in syllabus.items():
 
-        for topic in module["topics"]:
-            response += f"  {topic}\n"
+        response += (
+            f"\n{module_name}: "
+            f"{module['title']}\n"
+        )
+
+        for topic, points in module["topics"].items():
+
+            response += f"\n  {topic}\n"
+
+            for point in points:
+                response += f"    • {point}\n"
+
+        response += (
+            f"  Status: {module['status']}\n"
+        )
 
     return response
 
 
-# 2. GET PRACTICAL SYLLABUS
+# ========================================
+# 2. GET PRACTICAL INFORMATION
+# ========================================
+
 def get_practical_syllabus():
-    """Returns the complete AI practical/lab syllabus."""
+    """Return AI practical information."""
 
-    response = "\n===== AI PRACTICAL SYLLABUS =====\n"
+    practicals = ai_data["practicals"]
 
-    for practical_no, practical in practical_syllabus.items():
-        response += f"\nPractical {practical_no}: {practical['title']}\n"
+    response = "\n===== AI PRACTICALS =====\n"
 
-        for topic in practical["topics"]:
-            response += f"  {topic}\n"
+    response += (
+        f"\nStatus: {practicals['status']}\n"
+    )
 
     return response
 
 
+# ========================================
 # 3. GET EXAM INFORMATION
+# ========================================
+
 def get_exams():
-    """Returns available AI theory and practical exam information."""
+    """Return AI examination information."""
+
+    exam = ai_data["exam"]
+    evaluation = ai_data["evaluation"]
 
     response = "\n===== AI EXAMS =====\n"
 
-    for exam_type, exam_info in exams.items():
-        response += f"\n{exam_type}: {exam_info['date']}\n"
-        response += f"Time: {exam_info['time']}\n"
+    response += (
+        f"\nCourse: {ai_data['course_name']}\n"
+        f"Course Code: {ai_data['course_code']}\n"
+        f"Theory Exam Date: {exam['date']}\n"
+    )
+
+    response += "\nEvaluation Scheme:\n"
+
+    response += (
+        f"  CIA Activity: "
+        f"{evaluation['CIA']['Activity']} marks\n"
+    )
+
+    response += (
+        f"  CIA Test: "
+        f"{evaluation['CIA']['Test']} marks\n"
+    )
+
+    response += (
+        f"  CIA Attendance: "
+        f"{evaluation['CIA']['Attendance']} marks\n"
+    )
+
+    response += (
+        f"  CIA Total: "
+        f"{evaluation['CIA']['Total']} marks\n"
+    )
+
+    response += (
+        f"  Mid Semester Examination: "
+        f"{evaluation['Mid Semester Examination']} marks\n"
+    )
+
+    response += (
+        f"  End Semester Examination: "
+        f"{evaluation['End Semester Examination']} marks\n"
+    )
 
     return response
 
-# 4. FIND A TOPIC IN THEORY SYLLABUS
+
+# ========================================
+# 4. SEARCH FOR A THEORY TOPIC
+# ========================================
+
 def search_theory_topic(question):
-    """Searches for a topic mentioned in the user's question."""
+    """
+    Search for a topic or keyword from the
+    AI syllabus.
+    """
 
-    question = question.lower()
+    question = question.lower().strip()
 
-    for module_no, module in theory_syllabus.items():
+    syllabus = ai_data["syllabus"]
 
-        for topic in module["topics"]:
+    for module_name, module in syllabus.items():
 
-            if topic.lower() in question:
-                return (f"Yes, '{topic}' is part of Module {module_no}: {module['title']}.")
+        for topic, points in module["topics"].items():
+
+            # --------------------------------
+            # Check complete topic name
+            # --------------------------------
+
+            topic_lower = topic.lower()
+
+            if topic_lower in question:
+
+                response = (
+                    f"\n📚 {module_name}: "
+                    f"{module['title']}\n\n"
+                    f"{topic}\n"
+                )
+
+                for point in points:
+                    response += (
+                        f"  • {point}\n"
+                    )
+
+                return response
+
+            # --------------------------------
+            # Check individual syllabus points
+            # --------------------------------
+
+            for point in points:
+
+                point_lower = point.lower()
+
+                # Exact match
+                if point_lower in question:
+
+                    return (
+                        f"\n📚 {module_name}: "
+                        f"{module['title']}\n\n"
+                        f"{topic}\n"
+                        f"  • {point}"
+                    )
+
+                # --------------------------------
+                # Keyword matching
+                # --------------------------------
+
+                words = [
+                    word.strip(
+                        ".,!?()[]{}:;/-"
+                    )
+                    for word in point_lower.split()
+                ]
+
+                important_words = [
+                    word
+                    for word in words
+                    if len(word) >= 4
+                ]
+
+                for word in important_words:
+
+                    if word in question:
+
+                        return (
+                            f"\n📚 {module_name}: "
+                            f"{module['title']}\n\n"
+                            f"{topic}\n"
+                            f"  • {point}"
+                        )
 
     return None
 
+
+# ========================================
 # 5. FIND A MODULE
+# ========================================
 
 def search_module(question):
-    """Identifies whether the user is asking about a particular module."""
+    """
+    Identify whether the user is asking
+    about a particular module.
+    """
 
-    question = question.lower()
+    question = question.lower().strip()
 
-    for module_no, module in theory_syllabus.items():
+    syllabus = ai_data["syllabus"]
 
-        # Examples: "module 3", "module three"
-        if f"module {module_no}" in question:
+    for module_name, module in syllabus.items():
+
+        module_number = module_name.split()[-1]
+
+        # Examples:
+        # module 1
+        # module 2
+        # module 3
+
+        if (
+            f"module {module_number}" in question
+            or f"module{module_number}" in question
+        ):
+
             response = (
-                f"\nModule {module_no}: {module['title']}\n"
+                f"\n📚 {module_name}: "
+                f"{module['title']}\n"
             )
 
-            for topic in module["topics"]:
-                response += f"  - {topic}\n"
+            for topic, points in module["topics"].items():
+
+                response += (
+                    f"\n{topic}\n"
+                )
+
+                for point in points:
+
+                    response += (
+                        f"  • {point}\n"
+                    )
+
+            response += (
+                f"\nStatus: {module['status']}\n"
+            )
 
             return response
 
     return None
 
 
+# ========================================
 # 6. IDENTIFY USER INTENT
+# ========================================
 
 def identify_intent(question):
-    """Identifies the purpose of the user's question using simple keyword-based rules."""
+    """
+    Identify the purpose of the user's
+    question using keyword-based rules.
+    """
 
-    question = question.lower()
+    question = question.lower().strip()
 
-    # Exam-related questions
-    if any(word in question for word in ["exam", "examination", "test", "paper"]):
-        return "exam"
 
-    # Practical-related questions
-    elif any(word in question for word in ["practical", "lab", "experiment"]):
-        return "practical"
+    # ------------------------------------
+    # EXIT
+    # ------------------------------------
 
-    # Syllabus-related questions
-    elif any(word in question for word in["syllabus", "module", "topic", "unit"]):
-        return "syllabus"
+    if any(
+        word in question
+        for word in [
+            "exit",
+            "quit",
+            "bye"
+        ]
+    ):
 
-    # Greeting
-    elif any(word in question for word in ["hello", "hi", "hey"]):
+        return "exit"
+
+
+    # ------------------------------------
+    # GREETING
+    # ------------------------------------
+
+    if any(
+        word in question
+        for word in [
+            "hello",
+            "hi",
+            "hey",
+            "hii"
+        ]
+    ):
+
         return "greeting"
 
-    # Help
-    elif "help" in question:
+
+    # ------------------------------------
+    # HELP
+    # ------------------------------------
+
+    if "help" in question:
+
         return "help"
 
-    # Exit
-    elif any(word in question for word in ["exit", "quit", "bye"]):
-        return "exit"
+
+    # ------------------------------------
+    # EXAM
+    # ------------------------------------
+
+    if any(
+        word in question
+        for word in [
+            "exam",
+            "examination",
+            "test",
+            "paper"
+        ]
+    ):
+
+        return "exam"
+
+
+    # ------------------------------------
+    # PRACTICAL
+    # ------------------------------------
+
+    if any(
+        word in question
+        for word in [
+            "practical",
+            "lab",
+            "experiment"
+        ]
+    ):
+
+        return "practical"
+
+
+    # ------------------------------------
+    # ASSIGNMENT
+    # ------------------------------------
+
+    if "assignment" in question:
+
+        return "assignment"
+
+
+    # ------------------------------------
+    # MARKS / EVALUATION
+    # ------------------------------------
+
+    if any(
+        word in question
+        for word in [
+            "marks",
+            "evaluation",
+            "cia"
+        ]
+    ):
+
+        return "evaluation"
+
+
+    # ------------------------------------
+    # COURSE CODE
+    # ------------------------------------
+
+    if "course code" in question:
+
+        return "course_code"
+
+
+    # ------------------------------------
+    # COURSE NAME
+    # ------------------------------------
+
+    if (
+        "course name" in question
+        or "subject name" in question
+    ):
+
+        return "course_name"
+
+
+    # ------------------------------------
+    # SYLLABUS / MODULE
+    # ------------------------------------
+
+    if any(
+        word in question
+        for word in [
+            "syllabus",
+            "module",
+            "modules",
+            "topic",
+            "unit"
+        ]
+    ):
+
+        return "syllabus"
+
+
+    # ------------------------------------
+    # SPECIFIC SYLLABUS TOPIC
+    # ------------------------------------
+
+    if search_theory_topic(question) is not None:
+
+        return "syllabus"
+
+
+    # ------------------------------------
+    # UNKNOWN
+    # ------------------------------------
 
     return "unknown"
 
 
-# 7. ANSWER USER'S QUESTION
+# ========================================
+# 7. ANSWER USER QUESTION
+# ========================================
 
 def answer_question(question):
-    """Main rule-based reasoning function.
-    Takes the user's question, identifies the intent, and returns an appropriate response."""
+    """
+    Main rule-based reasoning function.
+
+    Takes the user's question,
+    identifies its intent,
+    accesses data.py,
+    and returns the answer.
+    """
 
     intent = identify_intent(question)
 
-    # Rule 1: Greeting
-    if intent == "greeting":
-        return "Hello! I am StudyBot. How can I help you with AI?"
 
-    # Rule 2: Help
-    elif intent == "help":
+    # ------------------------------------
+    # GREETING
+    # ------------------------------------
+
+    if intent == "greeting":
+
         return (
-            "\nYou can ask me things like:\n"
+            "Hello! 👋\n"
+            "I am StudyBot, your AI academic "
+            "assistant.\n"
+            "How can I help you?"
+        )
+
+
+    # ------------------------------------
+    # HELP
+    # ------------------------------------
+
+    elif intent == "help":
+
+        return (
+            "\nYou can ask me things like:\n\n"
+            "- What is the course code?\n"
+            "- What is the course name?\n"
             "- When is my AI exam?\n"
             "- Show me the AI syllabus.\n"
             "- What is in Module 3?\n"
-            "- What are the AI practicals?\n"
+            "- What is robotics?\n"
             "- Is A* algorithm in the syllabus?\n"
+            "- What are the practicals?\n"
+            "- What are the assignments?\n"
+            "- How many marks is the CIA?\n"
         )
 
-    # Rule 3: Exit
-    elif intent == "exit":
-        return "Goodbye! Hope you slayyy!"
 
-    # Rule 4: Exam question
+    # ------------------------------------
+    # EXIT
+    # ------------------------------------
+
+    elif intent == "exit":
+
+        return (
+            "Goodbye! 👋\n"
+            "Good luck with your studies!"
+        )
+
+
+    # ------------------------------------
+    # COURSE CODE
+    # ------------------------------------
+
+    elif intent == "course_code":
+
+        return (
+            f"The course code is "
+            f"{ai_data['course_code']}."
+        )
+
+
+    # ------------------------------------
+    # COURSE NAME
+    # ------------------------------------
+
+    elif intent == "course_name":
+
+        return (
+            f"The course is "
+            f"{ai_data['course_name']}."
+        )
+
+
+    # ------------------------------------
+    # EXAM
+    # ------------------------------------
+
     elif intent == "exam":
+
         return get_exams()
 
-    # Rule 5: Practical question
+
+    # ------------------------------------
+    # PRACTICAL
+    # ------------------------------------
+
     elif intent == "practical":
+
         return get_practical_syllabus()
 
-    # Rule 6: Syllabus question
+
+    # ------------------------------------
+    # ASSIGNMENT
+    # ------------------------------------
+
+    elif intent == "assignment":
+
+        return (
+            "\n===== AI ASSIGNMENTS =====\n\n"
+            f"Status: "
+            f"{ai_data['assignments']['status']}"
+        )
+
+
+    # ------------------------------------
+    # EVALUATION
+    # ------------------------------------
+
+    elif intent == "evaluation":
+
+        evaluation = ai_data["evaluation"]
+
+        return (
+            "\n===== EVALUATION =====\n\n"
+            f"CIA Activity: "
+            f"{evaluation['CIA']['Activity']} marks\n"
+            f"CIA Test: "
+            f"{evaluation['CIA']['Test']} marks\n"
+            f"CIA Attendance: "
+            f"{evaluation['CIA']['Attendance']} marks\n"
+            f"CIA Total: "
+            f"{evaluation['CIA']['Total']} marks\n"
+            f"Mid Semester Examination: "
+            f"{evaluation['Mid Semester Examination']} marks\n"
+            f"End Semester Examination: "
+            f"{evaluation['End Semester Examination']} marks\n"
+        )
+
+
+    # ------------------------------------
+    # SYLLABUS
+    # ------------------------------------
+
     elif intent == "syllabus":
-        # First check if the user asked about aparticular module.
+
+        # First check a specific module
+
         module_result = search_module(question)
 
         if module_result:
+
             return module_result
 
-        # Otherwise show the complete syllabus.
+
+        # Then check a specific topic
+
+        topic_result = search_theory_topic(question)
+
+        if topic_result:
+
+            return topic_result
+
+
+        # Otherwise return complete syllabus
+
         return get_theory_syllabus()
 
-    # Rule 7: Unknown question
+
+    # ------------------------------------
+    # UNKNOWN
+    # ------------------------------------
+
     else:
+
         return (
-            "Sorry, I don't understand that question yet.\n"
-            "Try asking about the AI syllabus, modules, practicals, or exams."
+            "Sorry, I don't understand "
+            "that question yet.\n\n"
+            "Try asking about:\n"
+            "- Course information\n"
+            "- AI syllabus\n"
+            "- Modules\n"
+            "- Exams\n"
+            "- Practicals\n"
+            "- Assignments\n"
+            "- Marks"
         )
