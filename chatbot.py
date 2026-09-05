@@ -6,27 +6,27 @@
 from data import subjects
 
 
-# ----------------------------------------
+# ========================================
 # GET AI DATA
-# ----------------------------------------
+# ========================================
 
 ai_data = subjects["AI"]
 
 
-# ----------------------------------------
+# ========================================
 # HEADER
-# ----------------------------------------
+# ========================================
 
 def show_header():
     print("\n" + "=" * 50)
-    print("🤖 STUDYBOT")
-    print("      Academic Assistant")
+    print("                 🤖 STUDYBOT")
+    print("              Academic Assistant")
     print("=" * 50)
 
 
-# ----------------------------------------
-# MENU
-# ----------------------------------------
+# ========================================
+# MAIN MENU
+# ========================================
 
 def show_menu():
     print("\nWhat would you like to do?")
@@ -43,10 +43,10 @@ def show_menu():
 # ========================================
 
 def view_syllabus():
-    syllabus = ai_data["theory_syllabus"]
+    syllabus = ai_data["syllabus"]
 
     print("\n" + "=" * 50)
-    print("📚 ARTIFICIAL INTELLIGENCE - THEORY SYLLABUS")
+    print("        📚 ARTIFICIAL INTELLIGENCE SYLLABUS")
     print("=" * 50)
 
     for module, details in syllabus.items():
@@ -61,39 +61,61 @@ def view_syllabus():
             for point in points:
                 print(f"   • {point}")
 
+        print(f"\nStatus: {details['status']}")
+
+    print("\n" + "=" * 50)
+
 
 # ========================================
 # OPTION 3 - VIEW EXAMS
 # ========================================
 
 def view_exams():
-    exam = ai_data["exam_details"]
+    exam = ai_data["exam"]
+    evaluation = ai_data["evaluation"]
 
     print("\n" + "=" * 50)
-    print("📝 EXAM INFORMATION")
+    print("              📝 EXAM INFORMATION")
     print("=" * 50)
 
-    print(f"\nCourse: {ai_data['course_name']}")
-    print(f"Course Code: {ai_data['course_code']}")
+    print(f"\nCourse Name : {ai_data['course_name']}")
+    print(f"Course Code : {ai_data['course_code']}")
+    print(f"Exam Date   : {exam['date']}")
 
-    print("\nTheory Exam:")
-    print(f"   Date: {exam['theory_exam']['date']}")
-
-    print("\nEvaluation Scheme:")
-    print(f"   CIA Activity: {exam['CIA']['Activity']} marks")
-    print(f"   CIA Test: {exam['CIA']['Test']} marks")
-    print(f"   CIA Attendance: {exam['CIA']['Attendance']} marks")
-    print(f"   CIA Total: {exam['CIA']['Total']} marks")
+    print("\nEvaluation Scheme")
+    print("-" * 50)
 
     print(
-        f"   Mid Semester Examination: "
-        f"{exam['mid_semester_examination']['marks']} marks"
+        f"CIA Activity                : "
+        f"{evaluation['CIA']['Activity']} marks"
     )
 
     print(
-        f"   End Semester Examination: "
-        f"{exam['end_semester_examination']['marks']} marks"
+        f"CIA Test                    : "
+        f"{evaluation['CIA']['Test']} marks"
     )
+
+    print(
+        f"CIA Attendance              : "
+        f"{evaluation['CIA']['Attendance']} marks"
+    )
+
+    print(
+        f"CIA Total                   : "
+        f"{evaluation['CIA']['Total']} marks"
+    )
+
+    print(
+        f"Mid Semester Examination    : "
+        f"{evaluation['Mid Semester Examination']} marks"
+    )
+
+    print(
+        f"End Semester Examination    : "
+        f"{evaluation['End Semester Examination']} marks"
+    )
+
+    print("\n" + "=" * 50)
 
 
 # ========================================
@@ -101,28 +123,15 @@ def view_exams():
 # ========================================
 
 def view_practicals():
-    practical = ai_data["practical_syllabus"]
+    practicals = ai_data["practicals"]
 
     print("\n" + "=" * 50)
-    print("🔬 PRACTICAL INFORMATION")
+    print("            🔬 PRACTICAL INFORMATION")
     print("=" * 50)
 
-    print(f"\n{practical['status']}")
+    print(f"\nStatus: {practicals['status']}")
 
-    if not practical["practicals"]:
-        return
-
-    for experiment in practical["practicals"]:
-
-        print(
-            f"\nExperiment {experiment['number']}: "
-            f"{experiment['title']}"
-        )
-
-        print(f"Description: {experiment['description']}")
-        print(f"CO: {experiment['CO']}")
-        print(f"BL: {experiment['BL']}")
-        print(f"Hours: {experiment['hours']}")
+    print("\n" + "=" * 50)
 
 
 # ========================================
@@ -130,13 +139,15 @@ def view_practicals():
 # ========================================
 
 def view_assignments():
+    assignments = ai_data["assignments"]
 
     print("\n" + "=" * 50)
-    print("📋 ASSIGNMENT INFORMATION")
+    print("            📋 ASSIGNMENT INFORMATION")
     print("=" * 50)
 
-    print("\nAssignment information is not currently")
-    print("provided in the knowledge base.")
+    print(f"\nStatus: {assignments['status']}")
+
+    print("\n" + "=" * 50)
 
 
 # ========================================
@@ -144,8 +155,7 @@ def view_assignments():
 # ========================================
 
 def find_module(question):
-
-    syllabus = ai_data["theory_syllabus"]
+    syllabus = ai_data["syllabus"]
 
     for module in syllabus:
 
@@ -160,16 +170,17 @@ def find_module(question):
 # ========================================
 
 def find_topic(question):
-
-    syllabus = ai_data["theory_syllabus"]
+    syllabus = ai_data["syllabus"]
 
     for module, details in syllabus.items():
 
         for topic, points in details["topics"].items():
 
+            # Check topic heading
             if topic.lower() in question:
                 return module, topic, points
 
+            # Check individual topic points
             for point in points:
 
                 if point.lower() in question:
@@ -179,27 +190,32 @@ def find_topic(question):
 
 
 # ========================================
-# ASK QUESTION
+# OPTION 1 - ASK A QUESTION
 # ========================================
 
 def ask_question():
 
     print("\n" + "=" * 50)
-    print("❓ ASK A QUESTION")
+    print("                 ❓ ASK A QUESTION")
     print("=" * 50)
 
     question = input("\nYou: ").lower().strip()
 
-    # Empty input
+    # ------------------------------------
+    # EMPTY QUESTION
+    # ------------------------------------
+
     if not question:
         print("StudyBot: Please enter a question.")
         return
 
     # ------------------------------------
-    # GREETING
+    # GREETINGS
     # ------------------------------------
 
-    if question in ["hi", "hello", "hey", "hii"]:
+    if question in ["hi", "hello", "hey", "hii", "good morning",
+                    "good afternoon", "good evening"]:
+
         print(
             "StudyBot: Hello! 😊 "
             "How can I help you with your AI course?"
@@ -225,7 +241,7 @@ def ask_question():
     if (
         "course name" in question
         or "subject name" in question
-        or "which subject" in question
+        or "what subject" in question
     ):
 
         print(
@@ -239,21 +255,34 @@ def ask_question():
     # ------------------------------------
 
     if (
-        "exam" in question
+        ("exam" in question or "examination" in question)
         and (
             "when" in question
             or "date" in question
+            or "schedule" in question
         )
     ):
 
         print(
-            f"StudyBot: Your theory exam is on "
-            f"{ai_data['exam_details']['theory_exam']['date']}."
+            f"StudyBot: Your AI theory exam is on "
+            f"{ai_data['exam']['date']}."
         )
         return
 
     # ------------------------------------
-    # MARKS / EVALUATION
+    # EXAM GENERAL QUESTION
+    # ------------------------------------
+
+    if "exam" in question or "examination" in question:
+
+        print(
+            f"StudyBot: Your AI theory exam is on "
+            f"{ai_data['exam']['date']}."
+        )
+        return
+
+    # ------------------------------------
+    # EVALUATION / MARKS
     # ------------------------------------
 
     if (
@@ -264,23 +293,38 @@ def ask_question():
         or "end semester" in question
     ):
 
-        exam = ai_data["exam_details"]
+        evaluation = ai_data["evaluation"]
 
         print("\nStudyBot: Evaluation Scheme")
 
         print(
-            f"   CIA Total: "
-            f"{exam['CIA']['Total']} marks"
+            f"CIA Activity: "
+            f"{evaluation['CIA']['Activity']} marks"
         )
 
         print(
-            f"   Mid Semester Examination: "
-            f"{exam['mid_semester_examination']['marks']} marks"
+            f"CIA Test: "
+            f"{evaluation['CIA']['Test']} marks"
         )
 
         print(
-            f"   End Semester Examination: "
-            f"{exam['end_semester_examination']['marks']} marks"
+            f"CIA Attendance: "
+            f"{evaluation['CIA']['Attendance']} marks"
+        )
+
+        print(
+            f"CIA Total: "
+            f"{evaluation['CIA']['Total']} marks"
+        )
+
+        print(
+            f"Mid Semester Examination: "
+            f"{evaluation['Mid Semester Examination']} marks"
+        )
+
+        print(
+            f"End Semester Examination: "
+            f"{evaluation['End Semester Examination']} marks"
         )
 
         return
@@ -293,7 +337,7 @@ def ask_question():
 
         print(
             f"StudyBot: "
-            f"{ai_data['practical_syllabus']['status']}."
+            f"{ai_data['practicals']['status']}."
         )
         return
 
@@ -304,27 +348,26 @@ def ask_question():
     if "assignment" in question:
 
         print(
-            "StudyBot: Assignment information is "
-            "not currently provided in the knowledge base."
+            f"StudyBot: "
+            f"{ai_data['assignments']['status']}."
         )
         return
 
     # ------------------------------------
-    # MODULE NAME
+    # MODULE QUESTION
     # ------------------------------------
 
     module = find_module(question)
 
     if module:
 
-        syllabus = ai_data["theory_syllabus"]
+        syllabus = ai_data["syllabus"]
 
-        # If user asks what a module is about
+        # Module name / title question
         if (
             "name" in question
             or "title" in question
             or "about" in question
-            or "topic" in question
         ):
 
             print(
@@ -334,14 +377,7 @@ def ask_question():
 
             return
 
-    # ------------------------------------
-    # COMPLETE MODULE DETAILS
-    # ------------------------------------
-
-    if module:
-
-        syllabus = ai_data["theory_syllabus"]
-
+        # Complete module details
         print(
             f"\nStudyBot: {module} - "
             f"{syllabus[module]['title']}"
@@ -354,10 +390,14 @@ def ask_question():
             for point in points:
                 print(f"   • {point}")
 
+        print(
+            f"\nStatus: {syllabus[module]['status']}"
+        )
+
         return
 
     # ------------------------------------
-    # SPECIFIC TOPIC
+    # SPECIFIC TOPIC QUESTION
     # ------------------------------------
 
     topic_result = find_topic(question)
@@ -370,25 +410,29 @@ def ask_question():
             f"\nStudyBot: {topic}"
         )
 
+        print(f"Module: {module}")
+
         for point in points:
             print(f"   • {point}")
 
         return
 
     # ------------------------------------
-    # SYLLABUS GENERAL QUESTION
+    # GENERAL SYLLABUS QUESTION
     # ------------------------------------
 
     if (
         "syllabus" in question
         or "modules" in question
+        or "topics" in question
     ):
 
         print(
-            "StudyBot: We have 6 theory modules."
+            "StudyBot: The AI syllabus contains "
+            "6 modules:"
         )
 
-        for module, details in ai_data["theory_syllabus"].items():
+        for module, details in ai_data["syllabus"].items():
 
             print(
                 f"   • {module}: "
@@ -402,14 +446,14 @@ def ask_question():
     # ------------------------------------
 
     print(
-        "StudyBot: Sorry, I don't understand "
-        "that question yet."
+        "StudyBot: Sorry, I couldn't understand "
+        "your question."
     )
 
     print(
         "You can ask about the course code, "
-        "exam, marks, syllabus, modules, "
-        "practicals, or assignments."
+        "course name, exam, marks, syllabus, "
+        "modules, practicals, or assignments."
     )
 
 
@@ -427,25 +471,44 @@ def main():
 
         choice = input("\nEnter your choice (1-6): ").strip()
 
-        if choice == "1":
+        # --------------------------------
+        # OPTION 1
+        # --------------------------------
 
+        if choice == "1":
             ask_question()
 
-        elif choice == "2":
+        # --------------------------------
+        # OPTION 2
+        # --------------------------------
 
+        elif choice == "2":
             view_syllabus()
 
-        elif choice == "3":
+        # --------------------------------
+        # OPTION 3
+        # --------------------------------
 
+        elif choice == "3":
             view_exams()
 
-        elif choice == "4":
+        # --------------------------------
+        # OPTION 4
+        # --------------------------------
 
+        elif choice == "4":
             view_practicals()
 
-        elif choice == "5":
+        # --------------------------------
+        # OPTION 5
+        # --------------------------------
 
+        elif choice == "5":
             view_assignments()
+
+        # --------------------------------
+        # OPTION 6
+        # --------------------------------
 
         elif choice == "6":
 
@@ -456,16 +519,20 @@ def main():
 
             break
 
+        # --------------------------------
+        # INVALID OPTION
+        # --------------------------------
+
         else:
 
             print(
-                "\nStudyBot: Invalid choice. "
-                "Please enter a number from 1 to 6."
+                "\nStudyBot: Please enter a number "
+                "from 1 to 6."
             )
 
 
 # ========================================
-# RUN PROGRAM
+# START PROGRAM
 # ========================================
 
 if __name__ == "__main__":
